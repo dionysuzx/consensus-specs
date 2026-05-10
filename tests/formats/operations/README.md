@@ -43,18 +43,26 @@ Operations:
 | `proposer_slashing`       | `ProposerSlashing`           | `proposer_slashing`     | `process_proposer_slashing(state, proposer_slashing)`                          |
 | `voluntary_exit`          | `SignedVoluntaryExit`        | `voluntary_exit`        | `process_voluntary_exit(state, voluntary_exit)`                                |
 | `sync_aggregate`          | `SyncAggregate`              | `sync_aggregate`        | `process_sync_aggregate(state, sync_aggregate)` (new in Altair)                |
-| `execution_payload`       | `BeaconBlockBody`            | **`body`**              | `process_execution_payload(state, body)` (new in Bellatrix)                    |
+| `execution_payload`       | `BeaconBlockBody`            | **`body`**              | `process_execution_payload(state, body)` (new in Bellatrix, removed in Gloas)  |
 | `withdrawals`             | `ExecutionPayload`           | `execution_payload`     | `process_withdrawals(state, execution_payload)` (new in Capella)               |
 | `bls_to_execution_change` | `SignedBLSToExecutionChange` | `address_change`        | `process_bls_to_execution_change(state, address_change)` (new in Capella)      |
 | `deposit_request`         | `DepositRequest`             | `deposit_request`       | `process_deposit_request(state, deposit_request)` (new in Electra)             |
 | `withdrawal_request`      | `WithdrawalRequest`          | `withdrawal_request`    | `process_withdrawal_request(state, withdrawal_request)` (new in Electra)       |
 | `consolidation_request`   | `ConsolidationRequest`       | `consolidation_request` | `process_consolidation_request(state, consolidation_request)` (new in Electra) |
+| `execution_payload_bid`   | `BeaconBlock`                | **`block`**             | `process_execution_payload_bid(state, block)` (new in Gloas)                   |
 | `payload_attestation`     | `PayloadAttestation`         | `payload_attestation`   | `process_payload_attestation(state, payload_attestation)` (new in Gloas)       |
 
-Note that `block_header` is not strictly an operation (and is a full `Block`),
-but processed in the same manner, and hence included here.
+Note that `block_header` and `execution_payload_bid` are not strictly operations
+(and use a full `BeaconBlock`), but are processed in the same manner, and hence
+included here.
 
-The `execution_payload` processing normally requires a
+For Gloas and later forks, `BeaconBlockBody` no longer includes the full
+`ExecutionPayload`. Instead, `execution_payload_bid` operation tests verify the
+`SignedExecutionPayloadBid` commitment in the beacon block, while
+`SignedExecutionPayloadEnvelope` processing is covered by the
+[`fork_choice`](../fork_choice/README.md) test format.
+
+The pre-Gloas `execution_payload` processing normally requires a
 `verify_execution_state_transition(execution_payload)`, a responsibility of an
 (external) execution engine. During testing this execution is mocked, an
 `execution.yml` is provided instead: a dict containing an `execution_valid`
