@@ -53,16 +53,16 @@ Operations:
 | `payload_attestation`     | `PayloadAttestation`         | `payload_attestation`   | `process_payload_attestation(state, payload_attestation)` (new in Gloas)       |
 
 Note that `block_header` and `execution_payload_bid` are not strictly operations
-(and use a full `BeaconBlock`), but are processed in the same manner, and hence
-included here.
+(they use a `BeaconBlock` input), but are processed in the same manner, and
+hence included here.
 
-For Gloas and later forks, `BeaconBlockBody` no longer includes the full
-`ExecutionPayload`. Instead, `execution_payload_bid` operation tests verify the
-`SignedExecutionPayloadBid` commitment in the beacon block, while
-`SignedExecutionPayloadEnvelope` processing is covered by the
-[`fork_choice`](../fork_choice/README.md) test format.
+In Gloas, `BeaconBlockBody` carries a `SignedExecutionPayloadBid` instead of a
+full `ExecutionPayload`, and `process_withdrawals` takes only `state`.
+`SignedExecutionPayloadEnvelope` handling is covered by the
+[`fork_choice`](../fork_choice/README.md) test format through
+`on_execution_payload_envelope(store, signed_envelope)`.
 
-The pre-Gloas `execution_payload` processing normally requires a
+For forks with the `execution_payload` handler, processing normally requires a
 `verify_execution_state_transition(execution_payload)`, a responsibility of an
 (external) execution engine. During testing this execution is mocked, an
 `execution.yml` is provided instead: a dict containing an `execution_valid`
